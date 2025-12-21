@@ -37,7 +37,6 @@ object RoomManager {
             val displayName = config.getString("display-name") ?: roomID
             val maxPlayers = config.getInt("max-players", 4)
 
-            //cargar esquinas
             val corner1 = Location(
                 Bukkit.getWorld(config.getString("corner1.world")!!),
                 config.getDouble("corner1.x"),
@@ -52,7 +51,6 @@ object RoomManager {
                 config.getDouble("corner2.z")
             )
 
-            //cargar nucleos
             val nucleusLocations = mutableMapOf<Int, Location>()
             for (level in 1..5) {
                 val nucleus = Location(

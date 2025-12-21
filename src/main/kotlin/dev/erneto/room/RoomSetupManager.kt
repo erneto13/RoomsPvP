@@ -30,11 +30,9 @@ class RoomSetupManager {
         val roomFile = File(roomsFolder, "${session.roomName}.yml")
         val config = YamlConfiguration()
 
-        //configuracion basica
         config.set("display-name", "<gradient:#ff6b6b:#4ecdc4>${session.roomName}")
         config.set("max-players", 4)
 
-        //esquinas
         val corner1 = session.corner1!!
         config.set("corner1.x", corner1.blockX)
         config.set("corner1.y", corner1.blockY)
@@ -47,7 +45,6 @@ class RoomSetupManager {
         config.set("corner2.z", corner2.blockZ)
         config.set("corner2.world", corner2.world?.name)
 
-        //nucleos por nivel
         for (level in 1..5) {
             val nucleus = session.nucleusLocations[level]!!
             config.set("nucleus.level-$level.x", nucleus.x)

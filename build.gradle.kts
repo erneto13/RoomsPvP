@@ -29,6 +29,7 @@ dependencies {
     paperweight.paperDevBundle("1.21.8-R0.1-SNAPSHOT")
 
     compileOnly("me.clip:placeholderapi:2.11.6")
+    implementation("dev.triumphteam:triumph-gui:3.1.13")
 
     zap(kotlin("stdlib"))
     zap("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -38,6 +39,7 @@ dependencies {
     zap("org.jetbrains.exposed:exposed-jdbc:0.57.0")
     zap("io.github.revxrsal:lamp.common:4.0.0-beta.25")
     zap("io.github.revxrsal:lamp.bukkit:4.0.0-beta.25")
+    zap("dev.triumphteam:triumph-gui:3.1.13")
     zap("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.21.0")
     zap("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.21.0")
 
