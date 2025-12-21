@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
-    kotlin("jvm") version "2.1.21-RC"
+    kotlin("jvm") version "2.1.20-RC"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.18"
     id("io.github.revxrsal.zapper") version "1.0.3"
 }
 
@@ -15,7 +15,14 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/") {
         name = "papermc-repo"
     }
+    maven("https://oss.sonatype.org/content/groups/public/") {
+        name = "sonatype"
+    }
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    maven("https://maven.enginehub.org/repo/")
+    maven("https://repo.codemc.io/repository/maven-releases/")
+    maven("https://repo.codemc.io/repository/maven-snapshots/")
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -41,7 +48,6 @@ zapper {
     libsFolder = "libs"
     repositories { includeProjectRepositories() }
 }
-
 
 val targetJavaVersion = 21
 

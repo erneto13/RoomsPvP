@@ -1,5 +1,9 @@
 package dev.erneto
 
+import dev.erneto.commands.RoomCommand
+import revxrsal.commands.Lamp
+import revxrsal.commands.bukkit.BukkitLamp
+import revxrsal.commands.bukkit.actor.BukkitCommandActor
 import revxrsal.zapper.ZapperJavaPlugin
 
 class RoomsPvP : ZapperJavaPlugin() {
@@ -10,10 +14,22 @@ class RoomsPvP : ZapperJavaPlugin() {
     }
 
     override fun onEnable() {
+        instance = this
+        registerCommands()
         logger.info("RoomsPvP has been enabled. Developed by erneto13")
     }
 
     override fun onDisable() {
         logger.info("RoomsPvP has been disabled. Developed by erneto13")
+    }
+
+    private fun registerCommands() {
+        val lamp: Lamp<BukkitCommandActor> = BukkitLamp.builder(this).build()
+
+        lamp.register(
+            RoomCommand(),
+        )
+
+        logger.info("Commands registered")
     }
 }
