@@ -1,14 +1,19 @@
 package dev.erneto
 
-import org.bukkit.plugin.java.JavaPlugin
+import revxrsal.zapper.ZapperJavaPlugin
 
-class RoomsPvP : JavaPlugin() {
+class RoomsPvP : ZapperJavaPlugin() {
+
+    companion object {
+        private lateinit var instance: RoomsPvP
+        fun getInstance(): RoomsPvP = instance
+    }
 
     override fun onEnable() {
-        // Plugin startup logic
+        logger.info("RoomsPvP has been enabled. Developed by erneto13")
     }
 
     override fun onDisable() {
-        // Plugin shutdown logic
+        logger.info("RoomsPvP has been disabled. Developed by erneto13")
     }
 }

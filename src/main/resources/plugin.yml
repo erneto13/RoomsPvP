@@ -3,4 +3,4 @@ version: '1.0-SNAPSHOT'
 main: dev.erneto.RoomsPvP
 api-version: '1.21'
 authors: [ erneto13 ]
-description: A simple and lightweight cosmetics plugin for use in various modes.
+description: A Minecraft PvP plugin with rooms and arenas.
