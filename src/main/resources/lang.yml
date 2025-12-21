@@ -1,0 +1,26 @@
+version: 1
+
+prefix: "<gradient:#ff6b6b:#4ecdc4><bold>RoomsPvP</bold></gradient> <dark_gray>»</dark_gray> "
+
+player-only: "<prefix><red>Solo los jugadores pueden ejecutar este comando."
+invalid-room-name: "<prefix><red>Nombre de room inválido. Usa solo letras, números, guiones y guiones bajos (máx. 32 caracteres)."
+
+room-setup-start: "<prefix><green>¡Configuración iniciada! <yellow>Click izquierdo</yellow> para la primera esquina."
+setup-corner1-set: "<prefix><green>Primera esquina establecida. <yellow>Click derecho</yellow> para la segunda esquina."
+setup-corner2-set: "<prefix><green>Segunda esquina establecida. Ahora usa <yellow>/room setup corepos <nivel></yellow>"
+setup-area-ready: "<prefix><aqua>Área definida correctamente. Visualización del borde activada."
+
+nucleus-set-level: "<prefix><green>Núcleo establecido para el nivel <yellow>%level%</yellow>."
+nucleus-set-all: "<prefix><green>Núcleo establecido para <yellow>todos los niveles</yellow>."
+setup-ready-to-save: "<prefix><gold>Setup completo. Usa <yellow>/room setup save</yellow> para guardar."
+setup-complete-saved: "<prefix><gold><bold>¡Room guardada exitosamente!</bold> <gray>La room ha sido configurada."
+setup-cancelled: "<prefix><yellow>Setup cancelado."
+
+no-setup-session: "<prefix><red>No tienes una sesión de setup activa. Usa <yellow>/room setup <nombre></yellow>"
+area-not-defined: "<prefix><red>Primero debes definir el área con el hacha de setup."
+invalid-level: "<prefix><red>Nivel inválido. Usa un número del 1 al 5 o 'all'."
+
+setup-validation-failed: "<prefix><red>El setup está incompleto:"
+setup-missing-corner1: "<prefix><red>- Falta definir la primera esquina"
+setup-missing-corner2: "<prefix><red>- Falta definir la segunda esquina"
+setup-missing-nucleus: "<prefix><red>- Faltan posiciones del núcleo (usa /room setup corepos)"

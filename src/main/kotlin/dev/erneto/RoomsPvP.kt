@@ -2,6 +2,11 @@ package dev.erneto
 
 import dev.erneto.commands.RoomCommand
 import dev.erneto.commands.RoomSetupCommand
+import dev.erneto.listener.SetupListener
+import dev.erneto.manager.RoomManager
+import dev.erneto.room.RoomSetupManager
+import dev.erneto.storage.file.FileManager
+import dev.erneto.visual.CuboidVisualizer
 import revxrsal.commands.Lamp
 import revxrsal.commands.bukkit.BukkitLamp
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
@@ -14,13 +19,26 @@ class RoomsPvP : ZapperJavaPlugin() {
         fun getInstance(): RoomsPvP = instance
     }
 
+    private lateinit var cuboidVisualizer: CuboidVisualizer
+    private lateinit var setupManager: RoomSetupManager
+
     override fun onEnable() {
         instance = this
+        setupManager = RoomSetupManager()
+
+        RoomManager.loadRooms()
+
+        initFileManager()
+        initVisualizer()
+
         registerCommands()
+        registerListeners()
+
         logger.info("RoomsPvP has been enabled. Developed by erneto13")
     }
 
     override fun onDisable() {
+        cuboidVisualizer.stopAllVisualizations()
         logger.info("RoomsPvP has been disabled. Developed by erneto13")
     }
 
@@ -29,9 +47,26 @@ class RoomsPvP : ZapperJavaPlugin() {
 
         lamp.register(
             RoomCommand(),
-            RoomSetupCommand(),
+            RoomSetupCommand(setupManager),
         )
 
         logger.info("Commands registered")
     }
+
+    private fun registerListeners() {
+        server.pluginManager.registerEvents(SetupListener(setupManager), this)
+        logger.info("Listeners registered")
+    }
+
+    private fun initFileManager() {
+        FileManager.initialize()
+        logger.info("FileManager initialized")
+    }
+
+    private fun initVisualizer() {
+        cuboidVisualizer = CuboidVisualizer(this)
+        logger.info("CuboidVisualizer initialized")
+    }
+
+    fun getCuboidVisualizer(): CuboidVisualizer = cuboidVisualizer
 }
