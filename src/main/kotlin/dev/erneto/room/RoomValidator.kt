@@ -1,5 +1,6 @@
 package dev.erneto.room
 
+import dev.erneto.manager.RoomManager
 import dev.erneto.utils.Message
 import org.bukkit.entity.Player
 
@@ -28,7 +29,9 @@ object RoomValidator {
     fun isValidRoomName(name: String?): Boolean {
         if (name.isNullOrBlank()) return false
         if (name.length > 32) return false
-        return name.matches(Regex("[a-zA-Z0-9_-]+"))
+        if (!name.matches(Regex("[a-zA-Z0-9_-]+"))) return false
+        if (RoomManager.roomExists(name)) return false
+        return true
     }
 
     fun validateBounds(session: RoomSetupSession): String? {

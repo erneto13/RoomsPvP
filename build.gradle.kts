@@ -34,6 +34,7 @@ dependencies {
     zap(kotlin("stdlib"))
     zap("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     zap("com.h2database:h2:2.2.220")
+    zap("mysql:mysql-connector-java:8.0.33")
     zap("org.jetbrains.exposed:exposed-core:0.57.0")
     zap("org.jetbrains.exposed:exposed-dao:0.57.0")
     zap("org.jetbrains.exposed:exposed-jdbc:0.57.0")

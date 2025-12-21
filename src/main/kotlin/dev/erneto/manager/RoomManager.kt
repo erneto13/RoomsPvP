@@ -2,10 +2,8 @@ package dev.erneto.manager
 
 import dev.erneto.RoomsPvP
 import dev.erneto.model.Room
-import org.bukkit.Bukkit
+import dev.erneto.storage.StorageManager
 import org.bukkit.Location
-import org.bukkit.configuration.file.YamlConfiguration
-import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 object RoomManager {
@@ -14,67 +12,29 @@ object RoomManager {
 
     fun loadRooms() {
         val plugin = RoomsPvP.getInstance()
-        val roomsFolder = File(plugin.dataFolder, "rooms")
+        rooms.clear()
 
-        if (!roomsFolder.exists() || !roomsFolder.isDirectory) {
-            plugin.logger.warning("Rooms folder does not exist")
-            return
+        val loadedRooms = StorageManager.loadRooms()
+
+        loadedRooms.forEach { room ->
+            rooms[room.name] = room
+            plugin.logger.info("Room '${room.name}' loaded - Crops: ${room.crops.size}, Ores: ${room.ores.size}")
         }
 
-        val roomFiles = roomsFolder.listFiles { _, name ->
-            name.endsWith(".yml", ignoreCase = true)
-        } ?: return
+        plugin.logger.info("Loaded ${rooms.size} room(s)")
+    }
 
-        if (roomFiles.isEmpty()) {
-            plugin.logger.warning("No room files found")
-            return
-        }
+    fun addRoom(room: Room) {
+        rooms[room.name] = room
+        StorageManager.saveRoom(room)
+    }
 
-        for (roomFile in roomFiles) {
-            val config = YamlConfiguration.loadConfiguration(roomFile)
-            val roomID = roomFile.nameWithoutExtension
-
-            val displayName = config.getString("display-name") ?: roomID
-            val maxPlayers = config.getInt("max-players", 4)
-
-            val corner1 = Location(
-                Bukkit.getWorld(config.getString("corner1.world")!!),
-                config.getDouble("corner1.x"),
-                config.getDouble("corner1.y"),
-                config.getDouble("corner1.z")
-            )
-
-            val corner2 = Location(
-                Bukkit.getWorld(config.getString("corner2.world")!!),
-                config.getDouble("corner2.x"),
-                config.getDouble("corner2.y"),
-                config.getDouble("corner2.z")
-            )
-
-            val nucleusLocations = mutableMapOf<Int, Location>()
-            for (level in 1..5) {
-                val nucleus = Location(
-                    Bukkit.getWorld(config.getString("nucleus.level-$level.world")!!),
-                    config.getDouble("nucleus.level-$level.x"),
-                    config.getDouble("nucleus.level-$level.y"),
-                    config.getDouble("nucleus.level-$level.z")
-                )
-                nucleusLocations[level] = nucleus
-            }
-
-            val room = Room(
-                roomID,
-                displayName,
-                corner1,
-                corner2,
-                nucleusLocations,
-                maxPlayers
-            )
-
-            room.scanBlocks()
-            rooms[roomID] = room
-
-            plugin.logger.info("Room '$roomID' loaded - Crops: ${room.crops.size}, Ores: ${room.ores.size}")
+    fun removeRoom(roomName: String): Boolean {
+        return if (rooms.remove(roomName) != null) {
+            StorageManager.deleteRoom(roomName)
+            true
+        } else {
+            false
         }
     }
 
@@ -85,6 +45,8 @@ object RoomManager {
     fun getRoomByLocation(location: Location): Room? {
         return rooms.values.find { it.isLocationInBounds(location) }
     }
+
+    fun roomExists(name: String): Boolean = rooms.containsKey(name)
 
     fun reloadRooms() {
         rooms.clear()

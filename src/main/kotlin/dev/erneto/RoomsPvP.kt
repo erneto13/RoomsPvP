@@ -1,10 +1,12 @@
 package dev.erneto
 
+import dev.dejvokep.boostedyaml.YamlDocument
 import dev.erneto.commands.RoomCommand
 import dev.erneto.commands.RoomSetupCommand
 import dev.erneto.listener.SetupListener
 import dev.erneto.manager.RoomManager
 import dev.erneto.room.RoomSetupManager
+import dev.erneto.storage.StorageManager
 import dev.erneto.storage.file.FileManager
 import dev.erneto.visual.CuboidVisualizer
 import revxrsal.commands.Lamp
@@ -26,11 +28,11 @@ class RoomsPvP : ZapperJavaPlugin() {
         instance = this
         setupManager = RoomSetupManager()
 
+        initFileManager()
+        initStorage()
         RoomManager.loadRooms()
 
-        initFileManager()
         initVisualizer()
-
         registerCommands()
         registerListeners()
 
@@ -63,10 +65,20 @@ class RoomsPvP : ZapperJavaPlugin() {
         logger.info("FileManager initialized")
     }
 
+    private fun initStorage() {
+        StorageManager.initialize()
+        logger.info("StorageManager initialized")
+    }
+
     private fun initVisualizer() {
         cuboidVisualizer = CuboidVisualizer(this)
         logger.info("CuboidVisualizer initialized")
     }
 
     fun getCuboidVisualizer(): CuboidVisualizer = cuboidVisualizer
+
+    fun getEngineConfig(): YamlDocument {
+        return FileManager.get("engine")
+            ?: throw IllegalStateException("Engine config not loaded")
+    }
 }

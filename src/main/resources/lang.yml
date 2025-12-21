@@ -24,3 +24,10 @@ setup-validation-failed: "<prefix><red>El setup está incompleto:"
 setup-missing-corner1: "<prefix><red>- Falta definir la primera esquina"
 setup-missing-corner2: "<prefix><red>- Falta definir la segunda esquina"
 setup-missing-nucleus: "<prefix><red>- Faltan posiciones del núcleo (usa /room setup corepos)"
+
+room-menu-title: "<gradient:#ff6b6b:#4ecdc4><bold>Rooms PvP</bold></gradient>"
+
+rooms-reloaded: "<prefix><green>Todas las rooms han sido recargadas."
+room-deleted: "<prefix><gold>Room <yellow>%room%</yellow> eliminada correctamente."
+room-not-found: "<prefix><red>La room <yellow>%room%</yellow> no existe."
+no-rooms-available: "<prefix><yellow>No hay rooms disponibles."

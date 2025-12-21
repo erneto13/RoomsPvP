@@ -1,9 +1,8 @@
 package dev.erneto.room
 
-import dev.erneto.RoomsPvP
-import org.bukkit.configuration.file.YamlConfiguration
+import dev.erneto.manager.RoomManager
+import dev.erneto.model.Room
 import org.bukkit.entity.Player
-import java.io.File
 import java.util.UUID
 
 class RoomSetupManager {
@@ -23,37 +22,17 @@ class RoomSetupManager {
     }
 
     fun saveRoom(session: RoomSetupSession) {
-        val plugin = RoomsPvP.getInstance()
-        val roomsFolder = File(plugin.dataFolder, "rooms")
-        roomsFolder.mkdirs()
+        val room = Room(
+            name = session.roomName,
+            displayName = "<gradient:#ff6b6b:#4ecdc4>${session.roomName}",
+            corner1 = session.corner1!!,
+            corner2 = session.corner2!!,
+            nucleusLocations = session.nucleusLocations,
+            maxPlayers = 4,
+            level = 1
+        )
 
-        val roomFile = File(roomsFolder, "${session.roomName}.yml")
-        val config = YamlConfiguration()
-
-        config.set("display-name", "<gradient:#ff6b6b:#4ecdc4>${session.roomName}")
-        config.set("max-players", 4)
-
-        val corner1 = session.corner1!!
-        config.set("corner1.x", corner1.blockX)
-        config.set("corner1.y", corner1.blockY)
-        config.set("corner1.z", corner1.blockZ)
-        config.set("corner1.world", corner1.world?.name)
-
-        val corner2 = session.corner2!!
-        config.set("corner2.x", corner2.blockX)
-        config.set("corner2.y", corner2.blockY)
-        config.set("corner2.z", corner2.blockZ)
-        config.set("corner2.world", corner2.world?.name)
-
-        for (level in 1..5) {
-            val nucleus = session.nucleusLocations[level]!!
-            config.set("nucleus.level-$level.x", nucleus.x)
-            config.set("nucleus.level-$level.y", nucleus.y)
-            config.set("nucleus.level-$level.z", nucleus.z)
-            config.set("nucleus.level-$level.world", nucleus.world?.name)
-        }
-
-        config.save(roomFile)
-        plugin.logger.info("Room '${session.roomName}' saved successfully")
+        room.scanBlocks()
+        RoomManager.addRoom(room)
     }
 }

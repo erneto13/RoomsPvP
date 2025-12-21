@@ -1,0 +1,42 @@
+#  ██▀███   ▒█████   ▒█████   ███▄ ▄███▓  ██████  ██▓███   ██▒   █▓ ██▓███
+# ▓██ ▒ ██▒▒██▒  ██▒▒██▒  ██▒▓██▒▀█▀ ██▒▒██    ▒ ▓██░  ██▒▓██░   █▒▓██░  ██▒
+# ▓██ ░▄█ ▒▒██░  ██▒▒██░  ██▒▓██    ▓██░░ ▓██▄   ▓██░ ██▓▒ ▓██  █▒░▓██░ ██▓▒
+# ▒██▀▀█▄  ▒██   ██░▒██   ██░▒██    ▒██   ▒   ██▒▒██▄█▓▒ ▒  ▒██ █░░▒██▄█▓▒ ▒
+# ░██▓ ▒██▒░ ████▓▒░░ ████▓▒░▒██▒   ░██▒▒██████▒▒▒██▒ ░  ░   ▒▀█░  ▒██▒ ░  ░
+# ░ ▒▓ ░▒▓░░ ▒░▒░▒░ ░ ▒░▒░▒░ ░ ▒░   ░  ░▒ ▒▓▒ ▒ ░▒▓▒░ ░  ░   ░ ▐░  ▒▓▒░ ░  ░
+#   ░▒ ░ ▒░  ░ ▒ ▒░   ░ ▒ ▒░ ░  ░      ░░ ░▒  ░ ░░▒ ░        ░ ░░  ░▒ ░
+#   ░░   ░ ░ ░ ░ ▒  ░ ░ ░ ▒  ░      ░   ░  ░  ░  ░░            ░░  ░░
+#    ░         ░ ░      ░ ░         ░         ░                 ░
+#                                                             ░
+# Engine Settings |
+#
+
+storage:
+  # Sets database type
+  type: "H2" # H2 or MYSQL
+
+  # H2 Database Settings
+  h2:
+    # Path to H2 database file
+    file: "data"
+
+  # MySQL Database Settings
+  mysql:
+    # Database host. Example: localhost:3306, 127.0.0.1:3306
+    host: "localhost"
+    # Database port. Example: 3306
+    port: 3306
+    # Name of the database. Example: roomspvp
+    database: "roomspvp"
+    # Username for database connection. Example: root
+    username: "root"
+    # Password for database connection. Example: password
+    password: "password"
+    # Additional MySQL connection properties
+    properties:
+      # Controls whether to use SSL for the connection
+      useSSL: false
+      # Controls automatic reconnection behavior
+      autoReconnect: true
+      # Controls the maximum number of reconnection attempts
+      maxReconnects: 3
