@@ -6,8 +6,9 @@ import revxrsal.commands.annotation.Subcommand
 
 @Command("room")
 class RoomCommand {
+
     @Subcommand("create")
     fun createRoom() {
-        Message.success("Room created successfully.")
+        //todo: implement create room logic
     }
 }

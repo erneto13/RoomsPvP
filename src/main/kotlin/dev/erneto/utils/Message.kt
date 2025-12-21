@@ -1,42 +1,38 @@
 package dev.erneto.utils
 
+import dev.erneto.storage.file.FileManager
+import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 object Message {
     private val miniMessage = MiniMessage.miniMessage()
 
-    private val PRIMARY = TextColor.fromHexString("#FF6B6B")
-    private val SECONDARY = TextColor.fromHexString("#4ECDC4")
-    private val SUCCESS = TextColor.fromHexString("#95E1D3")
-    private val ERROR = TextColor.fromHexString("#F38181")
-    private val INFO = TextColor.fromHexString("#A8E6CF")
-
-    private const val PREFIX = "<gradient:#FF6B6B:#4ECDC4><bold>RoomsPvP</bold></gradient> <gray>»</gray> "
-
-    fun parse(text: String): Component {
-        return miniMessage.deserialize(text)
+    fun getMsg(path: String): String {
+        return FileManager.get("lang")?.getString(path) ?: "Message not found: $path"
     }
 
-    fun success(message: String): Component {
-        return parse("$PREFIX<#95E1D3>$message")
+    fun parse(msg : String, player: Player) : TextComponent {
+        return miniMessage.deserialize(placeholder(msg, player)) as TextComponent
     }
 
-    fun error(message: String): Component {
-        return parse("$PREFIX<#F38181>✘ $message")
+    fun parse(msg : String) : TextComponent {
+        return miniMessage.deserialize(msg) as TextComponent
     }
 
-    fun info(message: String): Component {
-        return parse("$PREFIX<#A8E6CF>$message")
+    fun send(player: Player, path: String) {
+        player.sendMessage(parse(getMsg(path), player))
     }
 
-    fun warning(message: String): Component {
-        return parse("$PREFIX<#FFE66D>⚠ $message")
+    fun send(sender: CommandSender, path: String){
+        sender.sendMessage(parse(getMsg(path)))
     }
 
-    fun raw(message: String): Component {
-        return parse(message)
+    fun placeholder(msg: String, player: Player) : String {
+        return PlaceholderAPI.setPlaceholders(player, msg)
     }
 
     fun title(title: String, subtitle: String = ""): Pair<Component, Component> {

@@ -1,6 +1,7 @@
 package dev.erneto
 
 import dev.erneto.commands.RoomCommand
+import dev.erneto.commands.RoomSetupCommand
 import revxrsal.commands.Lamp
 import revxrsal.commands.bukkit.BukkitLamp
 import revxrsal.commands.bukkit.actor.BukkitCommandActor
@@ -28,6 +29,7 @@ class RoomsPvP : ZapperJavaPlugin() {
 
         lamp.register(
             RoomCommand(),
+            RoomSetupCommand(),
         )
 
         logger.info("Commands registered")
