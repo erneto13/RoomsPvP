@@ -33,14 +33,20 @@ dependencies {
 
     zap(kotlin("stdlib"))
     zap("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
     zap("com.h2database:h2:2.2.220")
     zap("mysql:mysql-connector-java:8.0.33")
+
     zap("org.jetbrains.exposed:exposed-core:0.57.0")
     zap("org.jetbrains.exposed:exposed-dao:0.57.0")
     zap("org.jetbrains.exposed:exposed-jdbc:0.57.0")
+    zap("org.jetbrains.exposed:exposed-java-time:0.57.0")
+
     zap("io.github.revxrsal:lamp.common:4.0.0-beta.25")
     zap("io.github.revxrsal:lamp.bukkit:4.0.0-beta.25")
+
     zap("dev.triumphteam:triumph-gui:3.1.13")
+
     zap("com.github.shynixn.mccoroutine:mccoroutine-bukkit-api:2.21.0")
     zap("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core:2.21.0")
 

@@ -22,14 +22,15 @@ class RoomSetupManager {
     }
 
     fun saveRoom(session: RoomSetupSession) {
+        val spawnPoint = session.spawnPoint ?: session.corner1!!.clone().add(0.5, 1.0, 0.5)
+
         val room = Room(
             name = session.roomName,
             displayName = "<gradient:#ff6b6b:#4ecdc4>${session.roomName}",
             corner1 = session.corner1!!,
             corner2 = session.corner2!!,
             nucleusLocations = session.nucleusLocations,
-            maxPlayers = 4,
-            level = 1
+            spawnPoint = spawnPoint
         )
 
         room.scanBlocks()

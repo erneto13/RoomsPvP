@@ -2,15 +2,18 @@ package dev.erneto.storage
 
 import dev.erneto.RoomsPvP
 import dev.erneto.model.Room
-import dev.erneto.storage.database.NucleusTable
-import dev.erneto.storage.database.RoomsTable
+import dev.erneto.model.RoomStatus
+import dev.erneto.storage.database.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.Material
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
+import java.time.Instant
+import java.util.UUID
 
 object StorageManager {
 
@@ -56,12 +59,14 @@ object StorageManager {
         transaction(database) {
             SchemaUtils.create(RoomsTable)
             SchemaUtils.create(NucleusTable)
+            SchemaUtils.create(BlockStatesTable)
         }
     }
 
     fun saveRoom(room: Room) {
         transaction(database) {
-            val existingId = RoomsTable.selectAll().where { RoomsTable.roomId eq room.name }.singleOrNull()?.get(RoomsTable.id)
+            val existingId = RoomsTable.selectAll().where { RoomsTable.roomId eq room.name }
+                .singleOrNull()?.get(RoomsTable.id)
 
             val roomDbId = if (existingId != null) {
                 RoomsTable.update({ RoomsTable.id eq existingId }) {
@@ -73,8 +78,16 @@ object StorageManager {
                     it[corner2X] = room.corner2.blockX
                     it[corner2Y] = room.corner2.blockY
                     it[corner2Z] = room.corner2.blockZ
-                    it[maxPlayers] = room.maxPlayers
-                    it[level] = room.level
+                    it[spawnX] = room.spawnPoint.x
+                    it[spawnY] = room.spawnPoint.y
+                    it[spawnZ] = room.spawnPoint.z
+                    it[spawnYaw] = room.spawnPoint.yaw
+                    it[spawnPitch] = room.spawnPoint.pitch
+                    it[currentLevel] = room.currentLevel
+                    it[status] = room.status.name
+                    it[owner] = room.owner?.toString()
+                    it[claimedAt] = room.claimedAt
+                    it[lastActivity] = room.lastActivity
                 }
                 existingId
             } else {
@@ -88,13 +101,20 @@ object StorageManager {
                     it[corner2X] = room.corner2.blockX
                     it[corner2Y] = room.corner2.blockY
                     it[corner2Z] = room.corner2.blockZ
-                    it[maxPlayers] = room.maxPlayers
-                    it[level] = room.level
+                    it[spawnX] = room.spawnPoint.x
+                    it[spawnY] = room.spawnPoint.y
+                    it[spawnZ] = room.spawnPoint.z
+                    it[spawnYaw] = room.spawnPoint.yaw
+                    it[spawnPitch] = room.spawnPoint.pitch
+                    it[currentLevel] = room.currentLevel
+                    it[status] = room.status.name
+                    it[owner] = room.owner?.toString()
+                    it[claimedAt] = room.claimedAt
+                    it[lastActivity] = room.lastActivity
                 } get RoomsTable.id
             }
 
             NucleusTable.deleteWhere { NucleusTable.roomDbId eq roomDbId }
-
             room.nucleusLocations.forEach { (lvl, loc) ->
                 NucleusTable.insert {
                     it[NucleusTable.roomDbId] = roomDbId
@@ -108,6 +128,36 @@ object StorageManager {
         }
     }
 
+    fun updateRoomState(room: Room) {
+        transaction(database) {
+            val roomDbId = RoomsTable.selectAll().where { RoomsTable.roomId eq room.name }
+                .singleOrNull()?.get(RoomsTable.id) ?: return@transaction
+
+            RoomsTable.update({ RoomsTable.id eq roomDbId }) {
+                it[currentLevel] = room.currentLevel
+                it[status] = room.status.name
+                it[owner] = room.owner?.toString()
+                it[claimedAt] = room.claimedAt
+                it[lastActivity] = room.lastActivity
+            }
+
+            BlockStatesTable.deleteWhere { BlockStatesTable.roomDbId eq roomDbId }
+            room.blockStates.forEach { (location, state) ->
+                BlockStatesTable.insert {
+                    it[BlockStatesTable.roomDbId] = roomDbId
+                    it[worldName] = location.world?.name ?: "world"
+                    it[x] = location.blockX
+                    it[y] = location.blockY
+                    it[z] = location.blockZ
+                    it[material] = state.material.name
+                    it[blockData] = state.data.asString
+                    it[blockType] = state.type.name
+                    it[lastUpdate] = state.lastUpdate
+                }
+            }
+        }
+    }
+
     fun loadRooms(): List<Room> {
         return transaction(database) {
             val rooms = mutableListOf<Room>()
@@ -115,7 +165,6 @@ object StorageManager {
             RoomsTable.selectAll().forEach { roomRow ->
                 val roomDbId = roomRow[RoomsTable.id]
                 val roomId = roomRow[RoomsTable.roomId]
-                val displayName = roomRow[RoomsTable.displayName]
                 val worldName = roomRow[RoomsTable.worldName]
                 val world = Bukkit.getWorld(worldName)
 
@@ -138,6 +187,15 @@ object StorageManager {
                     roomRow[RoomsTable.corner2Z].toDouble()
                 )
 
+                val spawnPoint = Location(
+                    world,
+                    roomRow[RoomsTable.spawnX],
+                    roomRow[RoomsTable.spawnY],
+                    roomRow[RoomsTable.spawnZ],
+                    roomRow[RoomsTable.spawnYaw],
+                    roomRow[RoomsTable.spawnPitch]
+                )
+
                 val nucleusLocations = mutableMapOf<Int, Location>()
                 NucleusTable.selectAll().where { NucleusTable.roomDbId eq roomDbId }.forEach { nucleusRow ->
                     val level = nucleusRow[NucleusTable.nucleusLevel]
@@ -155,15 +213,44 @@ object StorageManager {
 
                 val room = Room(
                     name = roomId,
-                    displayName = displayName,
+                    displayName = roomRow[RoomsTable.displayName],
                     corner1 = corner1,
                     corner2 = corner2,
                     nucleusLocations = nucleusLocations,
-                    maxPlayers = roomRow[RoomsTable.maxPlayers],
-                    level = roomRow[RoomsTable.level]
+                    spawnPoint = spawnPoint,
+                    currentLevel = roomRow[RoomsTable.currentLevel],
+                    status = RoomStatus.valueOf(roomRow[RoomsTable.status]),
+                    owner = roomRow[RoomsTable.owner]?.let { UUID.fromString(it) },
+                    claimedAt = roomRow[RoomsTable.claimedAt],
+                    lastActivity = roomRow[RoomsTable.lastActivity]
                 )
 
-                room.scanBlocks()
+                BlockStatesTable.selectAll().where { BlockStatesTable.roomDbId eq roomDbId }.forEach { stateRow ->
+                    val blockWorld = Bukkit.getWorld(stateRow[BlockStatesTable.worldName])
+                    if (blockWorld != null) {
+                        val location = Location(
+                            blockWorld,
+                            stateRow[BlockStatesTable.x].toDouble(),
+                            stateRow[BlockStatesTable.y].toDouble(),
+                            stateRow[BlockStatesTable.z].toDouble()
+                        )
+
+                        val material = Material.valueOf(stateRow[BlockStatesTable.material])
+                        val blockData = Bukkit.createBlockData(stateRow[BlockStatesTable.blockData])
+
+                        room.blockStates[location] = Room.BlockState(
+                            material = material,
+                            data = blockData,
+                            type = Room.BlockType.valueOf(stateRow[BlockStatesTable.blockType]),
+                            lastUpdate = stateRow[BlockStatesTable.lastUpdate]
+                        )
+                    }
+                }
+
+                if (room.blockStates.isEmpty()) {
+                    room.scanBlocks()
+                }
+
                 rooms.add(room)
             }
 
@@ -176,6 +263,7 @@ object StorageManager {
             val roomDbId = RoomsTable.selectAll().where { RoomsTable.roomId eq roomId }
                 .singleOrNull()?.get(RoomsTable.id) ?: return@transaction false
 
+            BlockStatesTable.deleteWhere { BlockStatesTable.roomDbId eq roomDbId }
             NucleusTable.deleteWhere { NucleusTable.roomDbId eq roomDbId }
             RoomsTable.deleteWhere { RoomsTable.roomId eq roomId } > 0
         }

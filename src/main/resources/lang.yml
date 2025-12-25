@@ -5,6 +5,7 @@ prefix: "<gradient:#ff6b6b:#4ecdc4><bold>RoomsPvP</bold></gradient> <dark_gray>�
 player-only: "<prefix><red>Solo los jugadores pueden ejecutar este comando."
 invalid-room-name: "<prefix><red>Nombre de room inválido. Usa solo letras, números, guiones y guiones bajos (máx. 32 caracteres)."
 
+# Setup messages
 room-setup-start: "<prefix><green>¡Configuración iniciada! <yellow>Click izquierdo</yellow> para la primera esquina."
 setup-corner1-set: "<prefix><green>Primera esquina establecida. <yellow>Click derecho</yellow> para la segunda esquina."
 setup-corner2-set: "<prefix><green>Segunda esquina establecida. Ahora usa <yellow>/room setup corepos <nivel></yellow>"
@@ -25,9 +26,25 @@ setup-missing-corner1: "<prefix><red>- Falta definir la primera esquina"
 setup-missing-corner2: "<prefix><red>- Falta definir la segunda esquina"
 setup-missing-nucleus: "<prefix><red>- Faltan posiciones del núcleo (usa /room setup corepos)"
 
+# Room management
 room-menu-title: "<gradient:#ff6b6b:#4ecdc4><bold>Rooms PvP</bold></gradient>"
-
 rooms-reloaded: "<prefix><green>Todas las rooms han sido recargadas."
 room-deleted: "<prefix><gold>Room <yellow>%room%</yellow> eliminada correctamente."
 room-not-found: "<prefix><red>La room <yellow>%room%</yellow> no existe."
 no-rooms-available: "<prefix><yellow>No hay rooms disponibles."
+
+# Player commands
+room-claimed: "<prefix><green>¡Has reclamado la room exitosamente!"
+room-not-available: "<prefix><red>Esta room no está disponible en este momento."
+room-occupied: "<prefix><red>Esta room está ocupada por otro jugador."
+room-unclaimed: "<prefix><yellow>Has liberado tu room."
+no-room-owned: "<prefix><red>No tienes ninguna room reclamada."
+not-room-owner: "<prefix><red>No eres el dueño de esta room."
+teleported-home: "<prefix><green>¡Bienvenido a casa!"
+teleported-to-room: "<prefix><green>¡Has sido teleportado a tu room!"
+
+# Nucleus events
+nucleus-destroyed: "<prefix><red><bold>¡Tu núcleo ha sido destruido!</bold>"
+
+# System messages
+room-inactive-unclaim: "<prefix><yellow>Tu room ha sido liberada por inactividad."

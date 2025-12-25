@@ -6,6 +6,7 @@ data class RoomSetupSession(
     val roomName: String,
     var corner1: Location? = null,
     var corner2: Location? = null,
+    var spawnPoint: Location? = null,
     val nucleusLocations: MutableMap<Int, Location> = mutableMapOf()
 ) {
     fun isComplete(): Boolean {

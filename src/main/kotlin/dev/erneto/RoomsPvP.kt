@@ -2,8 +2,11 @@ package dev.erneto
 
 import dev.dejvokep.boostedyaml.YamlDocument
 import dev.erneto.commands.RoomCommand
+import dev.erneto.commands.RoomPlayerCommand
 import dev.erneto.commands.RoomSetupCommand
+import dev.erneto.listener.RoomListener
 import dev.erneto.listener.SetupListener
+import dev.erneto.manager.RoomLifecycleManager
 import dev.erneto.manager.RoomManager
 import dev.erneto.room.RoomSetupManager
 import dev.erneto.storage.StorageManager
@@ -23,6 +26,7 @@ class RoomsPvP : ZapperJavaPlugin() {
 
     private lateinit var cuboidVisualizer: CuboidVisualizer
     private lateinit var setupManager: RoomSetupManager
+    private lateinit var lifecycleManager: RoomLifecycleManager
 
     override fun onEnable() {
         instance = this
@@ -32,6 +36,7 @@ class RoomsPvP : ZapperJavaPlugin() {
         initStorage()
         RoomManager.loadRooms()
 
+        initManagers()
         initVisualizer()
         registerCommands()
         registerListeners()
@@ -40,6 +45,7 @@ class RoomsPvP : ZapperJavaPlugin() {
     }
 
     override fun onDisable() {
+        RoomManager.saveAllRoomStates()
         cuboidVisualizer.stopAllVisualizations()
         logger.info("RoomsPvP has been disabled. Developed by erneto13")
     }
@@ -49,6 +55,7 @@ class RoomsPvP : ZapperJavaPlugin() {
 
         lamp.register(
             RoomCommand(),
+            RoomPlayerCommand(),
             RoomSetupCommand(setupManager),
         )
 
@@ -57,6 +64,7 @@ class RoomsPvP : ZapperJavaPlugin() {
 
     private fun registerListeners() {
         server.pluginManager.registerEvents(SetupListener(setupManager), this)
+        server.pluginManager.registerEvents(RoomListener(lifecycleManager), this)
         logger.info("Listeners registered")
     }
 
@@ -75,7 +83,14 @@ class RoomsPvP : ZapperJavaPlugin() {
         logger.info("CuboidVisualizer initialized")
     }
 
+    private fun initManagers() {
+        lifecycleManager = RoomLifecycleManager(this)
+        logger.info("RoomLifecycleManager initialized")
+    }
+
     fun getCuboidVisualizer(): CuboidVisualizer = cuboidVisualizer
+
+    fun getRoomLifecycleManager(): RoomLifecycleManager = lifecycleManager
 
     fun getEngineConfig(): YamlDocument {
         return FileManager.get("engine")

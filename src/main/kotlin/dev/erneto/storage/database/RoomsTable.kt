@@ -1,6 +1,7 @@
 package dev.erneto.storage.database
 
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.javatime.timestamp
 
 object RoomsTable : Table("rooms") {
     val id = integer("id").autoIncrement()
@@ -13,8 +14,16 @@ object RoomsTable : Table("rooms") {
     val corner2X = integer("corner2_x")
     val corner2Y = integer("corner2_y")
     val corner2Z = integer("corner2_z")
-    val maxPlayers = integer("max_players").default(4)
-    val level = integer("level").default(1)
+    val spawnX = double("spawn_x")
+    val spawnY = double("spawn_y")
+    val spawnZ = double("spawn_z")
+    val spawnYaw = float("spawn_yaw")
+    val spawnPitch = float("spawn_pitch")
+    val currentLevel = integer("current_level").default(1)
+    val status = varchar("status", 32).default("AVAILABLE")
+    val owner = varchar("owner", 36).nullable()
+    val claimedAt = timestamp("claimed_at").nullable()
+    val lastActivity = timestamp("last_activity").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

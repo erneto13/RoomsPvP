@@ -2,6 +2,8 @@ package dev.erneto.model
 
 import org.bukkit.Location
 import org.bukkit.Material
+import java.time.Instant
+import java.util.UUID
 
 data class Room(
     val name: String,
@@ -9,11 +11,38 @@ data class Room(
     val corner1: Location,
     val corner2: Location,
     val nucleusLocations: Map<Int, Location>,
-    val maxPlayers: Int,
-    val level: Int = 1
+    val spawnPoint: Location,
+    var currentLevel: Int = 1,
+    var status: RoomStatus = RoomStatus.AVAILABLE,
+    var owner: UUID? = null,
+    var claimedAt: Instant? = null,
+    var lastActivity: Instant? = null
 ) {
+    val blockStates: MutableMap<Location, BlockState> = mutableMapOf()
     val crops: MutableSet<BlockData> = mutableSetOf()
     val ores: MutableSet<BlockData> = mutableSetOf()
+
+    fun claim(player: UUID): Boolean {
+        if (status != RoomStatus.AVAILABLE) return false
+
+        owner = player
+        status = RoomStatus.OCCUPIED
+        claimedAt = Instant.now()
+        lastActivity = Instant.now()
+        return true
+    }
+
+    fun unclaim() {
+        owner = null
+        status = RoomStatus.RESETTING
+        claimedAt = null
+    }
+
+    fun isOwner(player: UUID): Boolean = owner == player
+
+    fun updateActivity() {
+        lastActivity = Instant.now()
+    }
 
     fun scanBlocks() {
         val world = corner1.world ?: return
@@ -29,14 +58,69 @@ data class Room(
             for (y in minY..maxY) {
                 for (z in minZ..maxZ) {
                     val block = world.getBlockAt(x, y, z)
+                    val location = block.location.clone()
+
                     if (isFarmable(block.type)) {
-                        crops.add(BlockData(block.location.clone(), block.type))
+                        val blockData = BlockData(location, block.type, block.blockData)
+                        crops.add(blockData)
+                        blockStates[location] = BlockState(block.type, block.blockData, BlockType.CROP)
                     }
+
                     if (isMineable(block.type)) {
-                        ores.add(BlockData(block.location.clone(), block.type))
+                        val blockData = BlockData(location, block.type, block.blockData)
+                        ores.add(blockData)
+                        blockStates[location] = BlockState(block.type, block.blockData, BlockType.ORE)
                     }
                 }
             }
+        }
+    }
+
+    fun saveBlockStates() {
+        val world = corner1.world ?: return
+
+        blockStates.clear()
+
+        val minX = minOf(corner1.blockX, corner2.blockX)
+        val maxX = maxOf(corner1.blockX, corner2.blockX)
+        val minY = minOf(corner1.blockY, corner2.blockY)
+        val maxY = maxOf(corner1.blockY, corner2.blockY)
+        val minZ = minOf(corner1.blockZ, corner2.blockZ)
+        val maxZ = maxOf(corner1.blockZ, corner2.blockZ)
+
+        for (x in minX..maxX) {
+            for (y in minY..maxY) {
+                for (z in minZ..maxZ) {
+                    val block = world.getBlockAt(x, y, z)
+                    val location = block.location.clone()
+
+                    val blockType = when {
+                        isFarmable(block.type) -> BlockType.CROP
+                        isMineable(block.type) -> BlockType.ORE
+                        block.type != Material.AIR -> BlockType.OTHER
+                        else -> null
+                    }
+
+                    blockType?.let {
+                        blockStates[location] = BlockState(
+                            material = block.type,
+                            data = block.blockData,
+                            type = it,
+                            lastUpdate = Instant.now()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun restoreBlockStates() {
+        val world = corner1.world ?: return
+
+        blockStates.forEach { (location, state) ->
+            val block = world.getBlockAt(location)
+            block.type = state.material
+            block.blockData = state.data
         }
     }
 
@@ -51,6 +135,24 @@ data class Room(
         return location.blockX in minX..maxX &&
                 location.blockY in minY..maxY &&
                 location.blockZ in minZ..maxZ
+    }
+
+    fun getCurrentNucleus(): Location? {
+        return nucleusLocations[currentLevel]
+    }
+
+    fun upgradeLevel(): Boolean {
+        if (currentLevel >= 5) return false
+        currentLevel++
+        lastActivity = Instant.now()
+        return true
+    }
+
+    fun downgradeLevel(): Boolean {
+        if (currentLevel <= 1) return false
+        currentLevel--
+        lastActivity = Instant.now()
+        return true
     }
 
     private fun isFarmable(material: Material): Boolean {
@@ -87,6 +189,27 @@ data class Room(
 
     data class BlockData(
         val location: Location,
-        val originalMaterial: Material
+        val originalMaterial: Material,
+        val originalData: org.bukkit.block.data.BlockData
     )
+
+    data class BlockState(
+        val material: Material,
+        val data: org.bukkit.block.data.BlockData,
+        val type: BlockType,
+        val lastUpdate: Instant = Instant.now()
+    )
+
+    enum class BlockType {
+        CROP,
+        ORE,
+        OTHER
+    }
+}
+
+enum class RoomStatus {
+    AVAILABLE,
+    OCCUPIED,
+    RESETTING,
+    MAINTENANCE
 }
