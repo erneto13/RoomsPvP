@@ -199,17 +199,4 @@ data class Room(
         val type: BlockType,
         val lastUpdate: Instant = Instant.now()
     )
-
-    enum class BlockType {
-        CROP,
-        ORE,
-        OTHER
-    }
-}
-
-enum class RoomStatus {
-    AVAILABLE,
-    OCCUPIED,
-    RESETTING,
-    MAINTENANCE
 }
