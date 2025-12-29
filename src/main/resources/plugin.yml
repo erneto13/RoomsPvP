@@ -1,0 +1,6 @@
+name: RoomsPvP
+version: '1.0-SNAPSHOT'
+main: dev.erneto.RoomsPvP
+api-version: '1.21'
+load: STARTUP
+authors: [erneto13]
